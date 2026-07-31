@@ -516,7 +516,7 @@ async function parseLoadedData(data: string[], mapVersion: string | null): Promi
       if (isVisible(select("#emblems")) && hasChild(select("#emblems"), "use")) turnOn("toggleEmblems");
       if (isVisible(select("#labels"))) turnOn("toggleLabels");
       if (isVisible(select("#icons"))) turnOn("toggleBurgIcons");
-      if (hasChildren(armies) && isVisible(armies)) turnOn("toggleMilitary");
+      // if (hasChildren(armies) && isVisible(armies)) turnOn("toggleMilitary");
       if (hasChild(select("#markers"), "svg")) turnOn("toggleMarkers");
       if (isVisible(select("#tradeAnimation"))) turnOn("toggleTrade");
       if (isVisible(select("#goods")) && hasChildren(select("#goods"))) turnOn("toggleGoods");

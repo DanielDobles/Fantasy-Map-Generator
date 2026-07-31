@@ -344,6 +344,56 @@ async function checkLoadParameters() {
     return;
   }
 
+  // Check if there is Arcaios default map available via local static folder
+  if (!params.get("seed") && !params.get("maplink")) {
+    try {
+      const mapUrl = `${location.origin}${location.pathname.replace(/\/$/, '')}/arcaios_dataset.map`;
+      const response = await fetch(mapUrl);
+      if (response.ok) {
+        WARN && console.warn("Auto-loading default Arcaios Dataset.map from:", mapUrl);
+        const blob = await response.blob();
+        window.Services.Load.uploadMap(blob, () => {
+          // APLICAR OPTIMIZACIONES DE RENDIMIENTO
+          try {
+            const viewboxEl = document.getElementById("viewbox");
+            if (viewboxEl) viewboxEl.setAttribute("shape-rendering", "optimizeSpeed");
+            
+            const shapeSelect = document.getElementById("shapeRendering");
+            if (shapeSelect) shapeSelect.value = "optimizeSpeed";
+
+            // Desactivar animaciones pesadas de GPU/CPU
+            const tradeAnim = document.getElementById("tradeAnimation");
+            if (tradeAnim) tradeAnim.style.display = "none";
+
+            const textureEl = document.getElementById("texture");
+            if (textureEl) textureEl.style.display = "none";
+            
+            // Desactivar ejércitos / milicia completamente
+            if (typeof window.turnButtonOff === "function") {
+              window.turnButtonOff("toggleMilitary");
+            } else {
+              const toggleMilitaryBtn = document.getElementById("toggleMilitary");
+              if (toggleMilitaryBtn) toggleMilitaryBtn.classList.add("buttonoff");
+            }
+            
+            const armiesEl = document.getElementById("armies");
+            if (armiesEl) {
+              armiesEl.style.display = "none";
+              armiesEl.innerHTML = "";
+            }
+            
+            console.log("⚡ Optimizaciones de Alto Rendimiento y Ejércitos Ocultados");
+          } catch (optErr) {
+            console.error("Error aplicando optimizaciones de rendimiento:", optErr);
+          }
+        });
+        return;
+      }
+    } catch (err) {
+      WARN && console.warn("Could not auto-fetch Arcaios Dataset.map, falling back to random");
+    }
+  }
+
   // check if there is a map saved to indexedDB
   if (ensureEl("onloadBehavior").value === "lastSaved") {
     try {
